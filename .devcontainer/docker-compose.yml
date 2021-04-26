@@ -1,0 +1,33 @@
+version: '3'
+services:
+  redis-app:
+    build:
+      context: ./docker/golang
+      dockerfile: Dockerfile
+      args:
+        - VARIANT=1.16
+        - INSTALL_NODE=true
+        - NODE_VERSION=lts/*
+    container_name: redis-app
+    volumes:
+      - ../:/go/github.com/MasatoTokuse/redis-go-example
+    working_dir: /go/github.com/MasatoTokuse/redis-go-example
+    tty: true
+    stdin_open: true
+    command: /bin/bash
+  redis:
+    image: redis
+    restart: always
+    container_name: redis
+    ports:
+      - 6379:6379
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    container_name: redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - 8081:8081
+    depends_on:
+      - redis
