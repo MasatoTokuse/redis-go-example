@@ -21,12 +21,13 @@ func main() {
 		client := NewRedisClient()
 		err := client.Set("countCurrentUser", 0, 0).Err()
 		panicIf(err)
-		loopN(RedisExample, 4000)
+		loopN(RedisMutualExclusionExample, 4000)
 	})
 	fmt.Println(execTime.Seconds())
 }
 
-func RedisExample(userIdInt int) {
+func RedisMutualExclusionExample(userIdInt int) {
+	start := time.Now()
 	userId := fmt.Sprint(userIdInt)
 	client := NewRedisClient()
 	pool := goredis.NewPool(client)
@@ -57,10 +58,10 @@ func RedisExample(userIdInt int) {
 		panicIf(err)
 		// fmt.Println(userId, val)
 	}
-
 	if ok, err := mutex.Unlock(); !ok || err != nil {
 		panic("unlock failed")
 	}
+	fmt.Printf("userId=%s, lockTime=%v, endedTime=%v\n", userId, time.Since(start), time.Now().Format("05.999999999"))
 }
 
 func NewRedisClient() *redis.Client {
