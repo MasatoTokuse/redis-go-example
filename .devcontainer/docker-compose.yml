@@ -17,13 +17,13 @@ services:
     command: /bin/bash
   redis:
     image: redis
-    restart: always
+    restart: on-failure
     container_name: redis
     ports:
       - 6379:6379
   redis-commander:
     image: rediscommander/redis-commander:latest
-    restart: always
+    restart: on-failure
     container_name: redis-commander
     environment:
       - REDIS_HOSTS=local:redis:6379
